@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --background: #efede6;
+  --foreground: #1a1d1b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Paleta Muniz — alto luxo: verde profundo + marfim + dourado champanhe */
+  --color-cal: #efede6;          /* marfim frio (fundo caiado) */
+  --color-cal-claro: #f6f4ef;    /* superfície quase branca */
+  --color-carvao: #171c1a;       /* tinta — preto-esverdeado */
+  --color-anil: #0e2e2b;         /* verde profundo (primário) */
+  --color-anil-escuro: #0a201e;  /* verde mais escuro (faixas/rodapé) */
+  --color-mangue: #1f6f53;       /* verde WhatsApp (ação) */
+  --color-mangue-escuro: #17553f;
+  --color-latao: #b08d45;        /* dourado champanhe (acento) */
+  --color-latao-claro: #cbae6b;  /* dourado claro (sobre fundo escuro) */
+  --color-latao-escuro: #8a6e34;
+  --color-grafite: #6b6a62;      /* pedra (texto secundário) */
+  --color-alerta: #8a3b1f;
+
+  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+  --font-utility: var(--font-jost);
+}
+
+body {
+  background: var(--color-cal);
+  color: var(--color-carvao);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-latao);
+  outline-offset: 2px;
+}

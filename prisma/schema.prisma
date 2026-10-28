@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  RENTER
+}
+
+enum PropertyType {
+  CASA
+  APARTAMENTO
+}
+
+enum PropertyStatus {
+  DISPONIVEL
+  RESERVADO
+  ALUGADO
+}
+
+enum ReservationStatus {
+  PENDING_PAYMENT
+  PAYMENT_CONFIRMED
+  CONTRACT_SIGNED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  cpf          String?
+  phone        String?
+  role         Role     @default(RENTER)
+  createdAt    DateTime @default(now())
+
+  reservations Reservation[]
+}
+
+model Property {
+  id           String         @id @default(cuid())
+  codigo       String         @unique
+  type         PropertyType   @default(CASA)
+  status       PropertyStatus @default(DISPONIVEL)
+  title        String
+  description  String
+  address      String
+  bairro       String
+  city         String         @default("Aracaju")
+  state        String         @default("SE")
+  priceMonthly Float
+  condominio   Float          @default(0)
+  iptu         Float          @default(0)
+  depositAmount Float         @default(300)
+  bedrooms     Int
+  bathrooms    Int
+  vagas        Int            @default(0)
+  areaM2       Float
+  andar        Int?
+  mobiliado    Boolean        @default(false)
+  aceitaPet    Boolean        @default(false)
+  photos       String // JSON-encoded array of image URLs (vazio = usar placeholder)
+  floorPlanUrl String?
+  brokerId     String?
+  broker       Broker?        @relation(fields: [brokerId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  reservations Reservation[]
+}
+
+model Broker {
+  id        String  @id @default(cuid())
+  name      String
+  creci     String
+  photoUrl  String
+  whatsapp  String
+  active    Boolean @default(true)
+
+  properties Property[]
+}
+
+model Testimonial {
+  id           String  @id @default(cuid())
+  authorName   String
+  photoUrl     String?
+  propertyCode String?
+  quote        String
+  published    Boolean @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model Reservation {
+  id            String            @id @default(cuid())
+  property      Property          @relation(fields: [propertyId], references: [id])
+  propertyId    String
+  renter        User              @relation(fields: [renterId], references: [id])
+  renterId      String
+  status        ReservationStatus @default(PENDING_PAYMENT)
+  depositAmount Float             @default(300)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  payment  Payment?
+  contract Contract?
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  reservation       Reservation   @relation(fields: [reservationId], references: [id])
+  reservationId     String        @unique
+  provider          String        @default("mercadopago")
+  providerPaymentId String?
+  preferenceId      String?
+  status            PaymentStatus @default(PENDING)
+  amount            Float
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model Contract {
+  id            String      @id @default(cuid())
+  reservation   Reservation @relation(fields: [reservationId], references: [id])
+  reservationId String      @unique
+  pdfPath       String?
+  signerName    String?
+  signerCpf     String?
+  signerIp      String?
+  documentHash  String?
+  signedAt      DateTime?
+  createdAt     DateTime    @default(now())
+}
+
+// Registro único (singleton, id fixo "default") com os dados públicos da
+// imobiliária, editável pelo administrador — nada disso deve ficar
+// hardcoded em componente.
+model BusinessSettings {
+  id                  String   @id @default("default")
+  name                String   @default("Muniz Imobiliária")
+  creci               String   @default("0000PJ")
+  whatsapp            String   @default("5579999999999")
+  phoneDisplay        String   @default("(79) 99999-9999")
+  addressStreet       String   @default("")
+  addressNeighborhood String   @default("")
+  addressCity         String   @default("Aracaju")
+  addressState        String   @default("SE")
+  addressZip          String   @default("")
+  hours               String   @default("")
+  instagramUrl        String?
+  facebookUrl         String?
+  updatedAt           DateTime @updatedAt
+}
+
+// Registro único (singleton, id fixo "default") com o texto/condições
+// gerais do contrato, editável pelo administrador.
+model ContractTemplate {
+  id           String   @id @default("default")
+  landlordName String   @default("Muniz Imobiliária")
+  rentDueDay   Int      @default(5)
+  termsText    String   @default("As demais condições deste contrato (prazo de vigência, reajuste, responsabilidade por encargos, condições de rescisão e demais cláusulas) deverão ser definidas e revisadas conforme a legislação vigente (Lei do Inquilinato — Lei nº 8.245/1991) e a política da imobiliária.")
+  updatedAt    DateTime @updatedAt
+}
