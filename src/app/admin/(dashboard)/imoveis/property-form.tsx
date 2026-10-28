@@ -66,6 +66,7 @@ interface PhotoItem {
   isLocal: boolean;
   file?: File;
   uploading?: boolean;
+  broken?: boolean;
 }
 
 export function PropertyForm({
@@ -88,7 +89,17 @@ export function PropertyForm({
       .split("\n")
       .map((line) => line.trim())
       .filter(Boolean)
-      .map((url) => ({ url, isLocal: false }));
+      .map((url) => {
+        // Detectar URLs locais antigas que não vão funcionar na Vercel
+        const isBrokenLocalUrl = url.startsWith("/uploads/");
+        return {
+          url: isBrokenLocalUrl ? "" : url,
+          isLocal: false,
+          uploading: false,
+          broken: isBrokenLocalUrl
+        };
+      })
+      .filter(p => p.url || p.broken); // Manter apenas URLs válidas ou marcadas como quebradas
   });
   const [uploadingCount, setUploadingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -183,8 +194,11 @@ export function PropertyForm({
     const form = new FormData(event.currentTarget);
     const payload = Object.fromEntries(form.entries());
 
-    // Build photosText from the photos array (all should be uploaded URLs now)
-    const photosText = photos.map((p) => p.url).join("\n");
+    // Build photosText from the photos array, filtering out broken/empty URLs
+    const photosText = photos
+      .filter((p) => !p.broken && p.url)
+      .map((p) => p.url)
+      .join("\n");
     payload.photosText = photosText;
 
     const response = await fetch(
@@ -370,12 +384,24 @@ export function PropertyForm({
         {photos.length > 0 && (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {photos.map((photo, index) => (
-              <div key={`${photo.url}-${index}`} className="relative group aspect-square rounded overflow-hidden border border-carvao/10 bg-grafite/5">
-                <img
-                  src={photo.url}
-                  alt={`Foto ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
+              <div key={`${photo.url || 'broken'}-${index}`} className="relative group aspect-square rounded overflow-hidden border border-carvao/10 bg-grafite/5">
+                {photo.broken ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-amber-50 text-amber-800 p-2 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1">
+                      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                      <path d="M12 9v4" />
+                      <path d="M12 17h.01" />
+                    </svg>
+                    <span className="text-xs font-medium">Foto antiga</span>
+                    <span className="text-[10px]">Remova e suba novamente</span>
+                  </div>
+                ) : (
+                  <img
+                    src={photo.url}
+                    alt={`Foto ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 {photo.uploading && (
                   <div className="absolute inset-0 bg-carvao/50 flex items-center justify-center">
                     <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
