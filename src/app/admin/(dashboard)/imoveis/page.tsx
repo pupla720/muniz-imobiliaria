@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StatusSelect } from "../status-select";
+import { DeletePropertyButton } from "./delete-property-button";
 import { adminHeading, adminBtnPrimary, adminBtnGhost } from "@/components/admin/ui";
 
 function formatBRL(value: number) {
@@ -58,6 +59,7 @@ export default async function AdminPropertiesPage() {
               >
                 Editar
               </Link>
+              <DeletePropertyButton propertyId={property.id} title={property.title} />
             </div>
           </div>
         ))}
