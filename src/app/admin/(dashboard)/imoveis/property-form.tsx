@@ -126,18 +126,18 @@ export function PropertyForm({
       newItems.map((item) => uploadFile(item.file!))
     );
 
+    let failedCount = 0;
     setPhotos((prev) => {
       const updated = [...prev];
-      // Find the items we just added (they are at the end minus any concurrent additions)
-      // We match by the objectURL
       newItems.forEach((item, idx) => {
         const pos = updated.findIndex((p) => p.url === item.url);
         if (pos !== -1) {
           if (uploadedUrls[idx]) {
             updated[pos] = { url: uploadedUrls[idx]!, isLocal: false, uploading: false };
           } else {
-            // Remove failed uploads
-            updated.splice(pos, 1);
+            // Mark as failed but keep the preview visible
+            updated[pos] = { ...updated[pos], uploading: false, isLocal: true };
+            failedCount++;
           }
         }
       });
@@ -145,6 +145,11 @@ export function PropertyForm({
     });
 
     setUploadingCount((c) => c - newItems.length);
+
+    if (failedCount > 0) {
+      setError(`Falha ao enviar ${failedCount} foto${failedCount > 1 ? "s" : ""}. Verifique se o arquivo tem menos de 5MB e tente novamente.`);
+    }
+
     // Reset file input so same file can be selected again
     if (fileInputRef.current) fileInputRef.current.value = "";
   }

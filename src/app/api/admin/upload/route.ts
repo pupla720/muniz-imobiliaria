@@ -3,6 +3,14 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
 const ALLOWED_CATEGORIES = ["corretores", "depoimentos", "imoveis"] as const;
 type Category = (typeof ALLOWED_CATEGORIES)[number];
 
