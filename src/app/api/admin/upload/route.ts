@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { put } from "@vercel/blob";
 import crypto from "node:crypto";
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "10mb",
-    },
-  },
-};
 
 const ALLOWED_CATEGORIES = ["corretores", "depoimentos", "imoveis"] as const;
 type Category = (typeof ALLOWED_CATEGORIES)[number];
@@ -47,12 +38,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Arquivo maior que 5MB." }, { status: 400 });
   }
 
-  const filename = `${crypto.randomUUID()}.${extension}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", category);
-  await mkdir(uploadDir, { recursive: true });
+  const filename = `${category}/${crypto.randomUUID()}.${extension}`;
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, filename), buffer);
+  try {
+    const blob = await put(filename, file, {
+      access: "public",
+      contentType: file.type,
+    });
 
-  return NextResponse.json({ url: `/uploads/${category}/${filename}` });
+    return NextResponse.json({ url: blob.url });
+  } catch (error) {
+    console.error("Erro no upload para Vercel Blob:", error);
+    return NextResponse.json(
+      { error: "Falha ao enviar arquivo. Verifique se o BLOB_READ_WRITE_TOKEN está configurado." },
+      { status: 500 },
+    );
+  }
 }

@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "import:properties": "tsx scripts/import-properties.ts",
+    "seed:properties": "tsx scripts/import-properties.ts",
+    "deploy": "vercel --prod"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -17,8 +20,10 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@react-pdf/renderer": "^4.5.1",
+    "@vercel/blob": "^2.8.2",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.3",
+    "lucide-react": "^0.468.0",
     "mercadopago": "^3.2.0",
     "next": "16.2.10",
     "pg": "^8.22.0",
@@ -34,11 +39,14 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "playwright": "^1.61.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vercel": "^39.0.0"
   }
 }
