@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { photosText, andar, brokerId, floorPlanUrl, ...rest } = parsed.data;
+  const { photosText, photosTextManaged, andar, brokerId, floorPlanUrl, ...rest } = parsed.data;
 
   const existing = await prisma.property.findUnique({
     where: { codigo: parsed.data.codigo },

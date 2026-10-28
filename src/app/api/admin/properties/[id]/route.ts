@@ -36,7 +36,7 @@ export async function PUT(
     );
   }
 
-  const { photosText, andar, brokerId, floorPlanUrl, ...rest } = parsed.data;
+  const { photosText, photosTextManaged, andar, brokerId, floorPlanUrl, ...rest } = parsed.data;
 
   const codigoInUse = await prisma.property.findFirst({
     where: { codigo: parsed.data.codigo, id: { not: id } },

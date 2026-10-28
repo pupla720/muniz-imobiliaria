@@ -3,7 +3,7 @@ import { z } from "zod";
 export const propertySchema = z.object({
   codigo: z
     .string()
-    .regex(/^[A-Z]{2,4}-\d{3,5}$/, "Use o formato AJU-0142"),
+    .regex(/^[A-Z]{2,4}-\d{3,5}$/, "Use o formato FSA-0142"),
   type: z.enum(["CASA", "APARTAMENTO"]),
   status: z.enum(["DISPONIVEL", "RESERVADO", "ALUGADO"]),
   title: z.string().min(3),
@@ -26,6 +26,7 @@ export const propertySchema = z.object({
   floorPlanUrl: z.string().url().optional().or(z.literal("")),
   brokerId: z.string().optional().or(z.literal("")),
   photosText: z.string().optional().default(""),
+  photosTextManaged: z.string().optional(),
 });
 
 export function photosTextToArray(photosText: string): string[] {
