@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 
-const ALLOWED_CATEGORIES = ["corretores", "depoimentos"] as const;
+const ALLOWED_CATEGORIES = ["corretores", "depoimentos", "imoveis"] as const;
 type Category = (typeof ALLOWED_CATEGORIES)[number];
 
 const ALLOWED_TYPES: Record<string, string> = {

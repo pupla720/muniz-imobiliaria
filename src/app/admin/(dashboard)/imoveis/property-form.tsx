@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   adminLabel,
@@ -43,8 +43,8 @@ const emptyValues: PropertyFormValues = {
   description: "",
   address: "",
   bairro: "",
-  city: "Aracaju",
-  state: "SE",
+  city: "Feira de Santana",
+  state: "BA",
   priceMonthly: 0,
   condominio: 0,
   iptu: 0,
@@ -61,6 +61,13 @@ const emptyValues: PropertyFormValues = {
   photosText: "",
 };
 
+interface PhotoItem {
+  url: string;
+  isLocal: boolean;
+  file?: File;
+  uploading?: boolean;
+}
+
 export function PropertyForm({
   propertyId,
   defaultValues,
@@ -75,14 +82,105 @@ export function PropertyForm({
   const initial = defaultValues ?? emptyValues;
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<PhotoItem[]>(() => {
+    if (!initial.photosText) return [];
+    return initial.photosText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((url) => ({ url, isLocal: false }));
+  });
+  const [uploadingCount, setUploadingCount] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function uploadFile(file: File): Promise<string | null> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", "imoveis");
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.url as string;
+    } catch {
+      return null;
+    }
+  }
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newItems: PhotoItem[] = Array.from(files).map((file) => ({
+      url: URL.createObjectURL(file),
+      isLocal: true,
+      file,
+      uploading: true,
+    }));
+
+    setPhotos((prev) => [...prev, ...newItems]);
+    setUploadingCount((c) => c + newItems.length);
+
+    // Upload each file
+    const uploadedUrls: (string | null)[] = await Promise.all(
+      newItems.map((item) => uploadFile(item.file!))
+    );
+
+    setPhotos((prev) => {
+      const updated = [...prev];
+      // Find the items we just added (they are at the end minus any concurrent additions)
+      // We match by the objectURL
+      newItems.forEach((item, idx) => {
+        const pos = updated.findIndex((p) => p.url === item.url);
+        if (pos !== -1) {
+          if (uploadedUrls[idx]) {
+            updated[pos] = { url: uploadedUrls[idx]!, isLocal: false, uploading: false };
+          } else {
+            // Remove failed uploads
+            updated.splice(pos, 1);
+          }
+        }
+      });
+      return updated;
+    });
+
+    setUploadingCount((c) => c - newItems.length);
+    // Reset file input so same file can be selected again
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => {
+      const item = prev[index];
+      if (item.isLocal && item.url.startsWith("blob:")) {
+        URL.revokeObjectURL(item.url);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  function handleUrlPaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
+    // Let default paste behavior work — URLs will be picked up on submit
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    // Check if any photos are still uploading
+    if (uploadingCount > 0) {
+      setError("Aguarde o upload das fotos terminar.");
+      return;
+    }
+
     setLoading(true);
 
     const form = new FormData(event.currentTarget);
     const payload = Object.fromEntries(form.entries());
+
+    // Build photosText from the photos array (all should be uploaded URLs now)
+    const photosText = photos.map((p) => p.url).join("\n");
+    payload.photosText = photosText;
 
     const response = await fetch(
       isEdit ? `/api/admin/properties/${propertyId}` : "/api/admin/properties",
@@ -111,7 +209,7 @@ export function PropertyForm({
     >
       <div className="grid grid-cols-2 gap-4">
         <Field
-          label="Código (ex: AJU-0142)"
+          label="Código (ex: FSA-0142)"
           name="codigo"
           defaultValue={initial.codigo}
           required
@@ -234,24 +332,109 @@ export function PropertyForm({
         defaultValue={initial.floorPlanUrl}
       />
 
-      <div className="space-y-1.5">
-        <label className={adminLabel}>
-          URLs das fotos reais (uma por linha, opcional — sem fotos, aparece o
-          placeholder &quot;foto em breve&quot;)
-        </label>
-        <textarea
-          name="photosText"
-          rows={3}
-          defaultValue={initial.photosText}
-          placeholder={"https://exemplo.com/foto1.jpg\nhttps://exemplo.com/foto2.jpg"}
-          className={adminTextarea}
-        />
+      {/* Seção de fotos com upload por arquivo */}
+      <div className="space-y-3">
+        <label className={adminLabel}>Fotos do imóvel</label>
+
+        {/* Botão de selecionar arquivos */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-anil border border-anil/30 rounded hover:bg-anil/5 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Escolher fotos do dispositivo
+          </button>
+          <span className="text-xs text-grafite">JPG, PNG ou WebP · máx. 5MB cada</span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+        </div>
+
+        {/* Preview das fotos */}
+        {photos.length > 0 && (
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            {photos.map((photo, index) => (
+              <div key={`${photo.url}-${index}`} className="relative group aspect-square rounded overflow-hidden border border-carvao/10 bg-grafite/5">
+                <img
+                  src={photo.url}
+                  alt={`Foto ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                {photo.uploading && (
+                  <div className="absolute inset-0 bg-carvao/50 flex items-center justify-center">
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removePhoto(index)}
+                  className="absolute top-1 right-1 w-6 h-6 bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  title="Remover foto"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {uploadingCount > 0 && (
+          <p className="text-xs text-anil">
+            Enviando {uploadingCount} foto{uploadingCount > 1 ? "s" : ""}…
+          </p>
+        )}
+
+        {/* Campo opcional de URLs manuais */}
+        <details className="text-sm">
+          <summary className="cursor-pointer text-grafite hover:text-carvao select-none">
+            Ou cole URLs manualmente (uma por linha)
+          </summary>
+          <textarea
+            name="photosText"
+            rows={2}
+            defaultValue=""
+            placeholder={"https://exemplo.com/foto1.jpg\nhttps://exemplo.com/foto2.jpg"}
+            className={`${adminTextarea} mt-2`}
+            onChange={() => {}}
+            onBlur={(e) => {
+              // Merge manual URLs into photos array on blur
+              const manualUrls = e.target.value
+                .split("\n")
+                .map((l) => l.trim())
+                .filter(Boolean);
+              if (manualUrls.length > 0) {
+                setPhotos((prev) => {
+                  const existingUrls = new Set(prev.map((p) => p.url));
+                  const newFromManual = manualUrls
+                    .filter((u) => !existingUrls.has(u))
+                    .map((url) => ({ url, isLocal: false }));
+                  return [...prev, ...newFromManual];
+                });
+                e.target.value = "";
+              }
+            }}
+          />
+        </details>
+
+        {/* Hidden field to carry photosText — managed via state in handleSubmit */}
+        <input type="hidden" name="photosTextManaged" value={photos.map((p) => p.url).join("\n")} />
       </div>
 
       {error && <p className="text-sm text-alerta">{error}</p>}
 
-      <button type="submit" disabled={loading} className={`${adminBtnPrimary} w-full`}>
-        {loading ? "Salvando…" : isEdit ? "Salvar alterações" : "Cadastrar imóvel"}
+      <button type="submit" disabled={loading || uploadingCount > 0} className={`${adminBtnPrimary} w-full disabled:opacity-50`}>
+        {loading ? "Salvando…" : uploadingCount > 0 ? "Aguarde o upload…" : isEdit ? "Salvar alterações" : "Cadastrar imóvel"}
       </button>
     </form>
   );
