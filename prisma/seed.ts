@@ -8,8 +8,8 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-// Placeholder — trocar pelo WhatsApp real dos corretores em /admin.
-const CENTRAL_WHATSAPP = "5579999999999";
+// Placeholder — trocar pelo WhatsApp real em /admin. DDD 75 (Feira de Santana/BA).
+const CENTRAL_WHATSAPP = "5575999999999";
 
 async function main() {
   const adminPasswordHash = await bcrypt.hash("admin123", 10);
@@ -27,27 +27,29 @@ async function main() {
 
   await prisma.businessSettings.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      addressCity: "Feira de Santana",
+      addressState: "BA",
+      whatsapp: CENTRAL_WHATSAPP,
+      phoneDisplay: "(75) 99999-9999",
+    },
     create: {
       id: "default",
       name: "Muniz Imobiliária",
       // Placeholders — editar os dados reais da empresa em /admin/empresa.
       creci: "0000PJ",
-      whatsapp: "5579999999999",
-      phoneDisplay: "(79) 99999-9999",
-      addressCity: "Aracaju",
-      addressState: "SE",
-      // TODO: endereço, horário e redes sociais reais — editar em /admin/empresa.
+      whatsapp: CENTRAL_WHATSAPP,
+      phoneDisplay: "(75) 99999-9999",
+      addressCity: "Feira de Santana",
+      addressState: "BA",
     },
   });
 
-  // Corretores reais, fotos em /public/corretores.
-  // TODO: confirmar se cada corretor tem WhatsApp individual ou se todos usam
-  // o número central da imobiliária (por ora, usando o central pra todos).
+  // Corretores de exemplo, fotos em /public/corretores.
   const [alan, alessandra, diogo] = await Promise.all([
     prisma.broker.upsert({
       where: { id: "broker-alan-cabral" },
-      update: {},
+      update: { whatsapp: CENTRAL_WHATSAPP },
       create: {
         id: "broker-alan-cabral",
         name: "Alan Cabral",
@@ -58,7 +60,7 @@ async function main() {
     }),
     prisma.broker.upsert({
       where: { id: "broker-alessandra-alves" },
-      update: {},
+      update: { whatsapp: CENTRAL_WHATSAPP },
       create: {
         id: "broker-alessandra-alves",
         name: "Alessandra Alves",
@@ -69,7 +71,7 @@ async function main() {
     }),
     prisma.broker.upsert({
       where: { id: "broker-diogo-almeida" },
-      update: {},
+      update: { whatsapp: CENTRAL_WHATSAPP },
       create: {
         id: "broker-diogo-almeida",
         name: "Diogo Breda Frota De Almeida",
@@ -80,19 +82,23 @@ async function main() {
     }),
   ]);
 
-  // Imóveis de exemplo em bairros reais de Aracaju/SE.
-  // TODO: fotos reais de cada imóvel — por ora `photos` fica vazio e a
-  // interface mostra um placeholder marcado, nunca banco de imagens.
+  // Remove os imóveis de exemplo antigos (Aracaju) antes de recriar, para não
+  // deixar duplicado ao trocar a cidade.
+  await prisma.property.deleteMany({ where: { codigo: { startsWith: "AJU-" } } });
+
+  // Imóveis de exemplo em bairros reais de Feira de Santana/BA.
   const properties = [
     {
-      codigo: "AJU-0101",
+      codigo: "FSA-0101",
       type: "APARTAMENTO" as const,
       status: "DISPONIVEL" as const,
-      title: "Apartamento 2 quartos no Jardins",
+      title: "Apartamento 2 quartos no Ponto Central",
       description:
-        "Apartamento andar alto, bem iluminado, a 5 minutos do Shopping Jardins. Prédio com portaria 24h.",
-      address: "Rua Campos Sales, próx. ao Shopping Jardins",
-      bairro: "Jardins",
+        "Apartamento bem iluminado, a poucos minutos do Shopping Boulevard. Prédio com portaria 24h.",
+      address: "Av. Getúlio Vargas, próx. ao Shopping Boulevard",
+      bairro: "Ponto Central",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 1800,
       condominio: 350,
       iptu: 60,
@@ -107,14 +113,16 @@ async function main() {
       brokerId: alan.id,
     },
     {
-      codigo: "AJU-0102",
+      codigo: "FSA-0102",
       type: "CASA" as const,
       status: "DISPONIVEL" as const,
-      title: "Casa 3 quartos na Coroa do Meirinho",
+      title: "Casa 3 quartos no Santa Mônica",
       description:
         "Casa térrea com quintal, garagem coberta para 2 carros e área de serviço externa.",
-      address: "Rua Itabaiana, Coroa do Meirinho",
-      bairro: "Coroa do Meirinho",
+      address: "Rua da Gameleira, Santa Mônica",
+      bairro: "Santa Mônica",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 1600,
       condominio: 0,
       iptu: 45,
@@ -129,14 +137,16 @@ async function main() {
       brokerId: alessandra.id,
     },
     {
-      codigo: "AJU-0103",
+      codigo: "FSA-0103",
       type: "APARTAMENTO" as const,
       status: "RESERVADO" as const,
-      title: "Apartamento 3 quartos na Atalaia",
+      title: "Apartamento 3 quartos no Capuchinhos",
       description:
-        "A 400m da orla da Atalaia, suíte + 2 quartos, varanda gourmet. Condomínio com piscina.",
-      address: "Av. Santos Dumont, Atalaia",
-      bairro: "Atalaia",
+        "Suíte + 2 quartos, varanda gourmet e condomínio com piscina, próximo à Av. Maria Quitéria.",
+      address: "Av. Maria Quitéria, Capuchinhos",
+      bairro: "Capuchinhos",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 2600,
       condominio: 480,
       iptu: 95,
@@ -151,13 +161,16 @@ async function main() {
       brokerId: diogo.id,
     },
     {
-      codigo: "AJU-0104",
+      codigo: "FSA-0104",
       type: "CASA" as const,
       status: "DISPONIVEL" as const,
-      title: "Casa 2 quartos na Farolândia",
-      description: "Casa compacta, recém-reformada, próxima à UFS. Ideal para universitários.",
-      address: "Rua Vereador José do Prado Franco, Farolândia",
-      bairro: "Farolândia",
+      title: "Casa 2 quartos no Tomba",
+      description:
+        "Casa compacta, recém-reformada, próxima à UEFS. Ideal para universitários.",
+      address: "Rua Juracy Magalhães, Tomba",
+      bairro: "Tomba",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 1100,
       condominio: 0,
       iptu: 30,
@@ -172,13 +185,16 @@ async function main() {
       brokerId: alan.id,
     },
     {
-      codigo: "AJU-0105",
+      codigo: "FSA-0105",
       type: "APARTAMENTO" as const,
       status: "DISPONIVEL" as const,
-      title: "Apartamento 1 quarto no Grageru",
-      description: "Studio funcional, próximo ao Shopping Jardins e Riomar. Ótimo para quem mora só.",
-      address: "Av. Ministro Geraldo Barreto Sobral, Grageru",
-      bairro: "Grageru",
+      title: "Apartamento 1 quarto no Centro",
+      description:
+        "Studio funcional, próximo ao Centro de Abastecimento e à Av. Senhor dos Passos. Ótimo para quem mora só.",
+      address: "Av. Senhor dos Passos, Centro",
+      bairro: "Centro",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 1200,
       condominio: 280,
       iptu: 40,
@@ -193,13 +209,15 @@ async function main() {
       brokerId: alessandra.id,
     },
     {
-      codigo: "AJU-0106",
+      codigo: "FSA-0106",
       type: "CASA" as const,
       status: "ALUGADO" as const,
-      title: "Casa 4 quartos na Luzia",
+      title: "Casa 4 quartos no SIM",
       description: "Casa duplex, 4 quartos sendo 1 suíte, quintal amplo com churrasqueira.",
-      address: "Rua Itabaianinha, Luzia",
-      bairro: "Luzia",
+      address: "Rua das Palmeiras, SIM",
+      bairro: "SIM",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 2200,
       condominio: 0,
       iptu: 70,
@@ -214,13 +232,16 @@ async function main() {
       brokerId: diogo.id,
     },
     {
-      codigo: "AJU-0107",
+      codigo: "FSA-0107",
       type: "APARTAMENTO" as const,
       status: "DISPONIVEL" as const,
-      title: "Apartamento 2 quartos no Salgado Filho",
-      description: "Próximo ao Terminal de Ônibus e ao Mercado Municipal. Bom para quem usa transporte público.",
-      address: "Av. Perimetral, Salgado Filho",
-      bairro: "Salgado Filho",
+      title: "Apartamento 2 quartos no Cidade Nova",
+      description:
+        "Próximo ao Terminal Rodoviário e a linhas de ônibus. Bom para quem usa transporte público.",
+      address: "Av. Eduardo Fróes da Mota, Cidade Nova",
+      bairro: "Cidade Nova",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 950,
       condominio: 180,
       iptu: 25,
@@ -235,13 +256,15 @@ async function main() {
       brokerId: alan.id,
     },
     {
-      codigo: "AJU-0108",
+      codigo: "FSA-0108",
       type: "CASA" as const,
       status: "DISPONIVEL" as const,
-      title: "Casa 3 quartos no Aeroporto",
+      title: "Casa 3 quartos no Brasília",
       description: "Casa em condomínio fechado, com portaria e área de lazer compartilhada.",
-      address: "Rua Prof. José Silvério Leite Fontes, Aeroporto",
-      bairro: "Aeroporto",
+      address: "Rua Boa Esperança, Brasília",
+      bairro: "Brasília",
+      city: "Feira de Santana",
+      state: "BA",
       priceMonthly: 1900,
       condominio: 220,
       iptu: 55,

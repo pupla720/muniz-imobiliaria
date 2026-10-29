@@ -1,0 +1,124 @@
+[
+  {
+    "id": "fs-001",
+    "title": "Apartamento Moderno no SIM - Próximo à UNIFACS",
+    "purpose": "rent",
+    "description": "Excelente apartamento no bairro SIM, a poucos minutos da UNIFACS Campus Santa Mônica e do Boulevard Shopping. Imóvel com acabamento moderno, varanda gourmet, 2 quartos sendo 1 suíte, cozinha americana planejada e 1 vaga de garagem. Condomínio com piscina, academia e salão de festas. Região com alta demanda de locação estudantil e fácil acesso à Av. Artemia Pires e BR-324.",
+    "location": { "neighborhood": "SIM", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 65, "bedrooms": 2, "suites": 1, "parkingSpots": 1 },
+    "images": [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 2200,
+      "discountPercent": 35,
+      "displayPrice": 1430,
+      "condoFee": 450,
+      "iptuMonthly": 80
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  },
+  {
+    "id": "fs-002",
+    "title": "Flat Mobiliado no Santa Mônica - Ao Lado da UNIFACS",
+    "purpose": "rent",
+    "description": "Flat totalmente mobiliado e equipado na Rua Rio Tinto, a poucos passos do campus Santa Mônica da UNIFACS. Ideal para estudantes universitários e jovens profissionais. Conta com ar-condicionado, cama box, kitchenette completa, armários planejados e serviço de limpeza opcional. Prédio com portaria 24h, lavanderia coletiva e coworking. Localização estratégica para quem estuda ou trabalha na região.",
+    "location": { "neighborhood": "Santa Mônica", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 32, "bedrooms": 1, "suites": 0, "parkingSpots": 0 },
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 1800,
+      "discountPercent": 35,
+      "displayPrice": 1170,
+      "condoFee": 350
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  },
+  {
+    "id": "fs-003",
+    "title": "Kitnet Estudantil nos Capuchinhos - Perto da UNEF",
+    "purpose": "rent",
+    "description": "Kitnet funcional no bairro Capuchinhos, região com forte presença universitária próxima à UNEF (Av. Luís Eduardo Magalhães) e à FTC. Ambiente integrado com cozinha equipada, banheiro moderno, móveis planejados e internet fibra inclusa. Prédio novo com bicicletário e área de estudos compartilhada. Perfeito para estudantes que buscam praticidade e economia.",
+    "location": { "neighborhood": "Capuchinhos", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 28, "bedrooms": 1, "suites": 0, "parkingSpots": 0 },
+    "images": [
+      "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1556909114-44e3e70034e2?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 1400,
+      "discountPercent": 35,
+      "displayPrice": 910,
+      "condoFee": 280
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  },
+  {
+    "id": "fs-004",
+    "title": "Apartamento 3 Quartos no Ponto Central - Próximo à FAN/UNIFAN",
+    "purpose": "rent",
+    "description": "Amplo apartamento no Ponto Central, a poucos metros do Centro Universitário Nobre (UNIFAN/FAN) na Av. Maria Quitéria. Três dormitórios espaçosos sendo 1 suíte, dois banheiros, sala para dois ambientes com varanda, cozinha planejada e dependência completa. Prédio com elevador, interfone e portaria. Região nobre com comércio completo, bancos e fácil acesso às principais avenidas.",
+    "location": { "neighborhood": "Ponto Central", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 95, "bedrooms": 3, "suites": 1, "parkingSpots": 1 },
+    "images": [
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 3200,
+      "discountPercent": 35,
+      "displayPrice": 2080,
+      "condoFee": 600,
+      "iptuMonthly": 150
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  },
+  {
+    "id": "fs-005",
+    "title": "Casa Térrea em Mangabeira - Ideal para República Estudantil",
+    "purpose": "rent",
+    "description": "Casa térrea espaçosa no bairro Mangabeira, perfeita para república de estudantes ou famílias. Possui 4 quartos amplos, 2 banheiros, sala grande, cozinha com copa, área de serviço coberta e quintal com churrasqueira. Garagem para 3 carros. Rua pavimentada, segura e arborizada, próxima a supermercados, farmácias e linhas de ônibus que passam pelas universidades (UNEF, FTC, UNIFACS).",
+    "location": { "neighborhood": "Mangabeira", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 150, "bedrooms": 4, "suites": 1, "parkingSpots": 3 },
+    "images": [
+      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 2800,
+      "discountPercent": 35,
+      "displayPrice": 1820,
+      "iptuMonthly": 140
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  },
+  {
+    "id": "fs-006",
+    "title": "Studio no Centro - Acesso Rápido a Todas as Faculdades",
+    "purpose": "rent",
+    "description": "Studio inteligente no coração de Feira de Santana, com acesso rápido a todas as principais instituições de ensino (UNIFACS Centro, Estácio, FAN). Totalmente mobiliado com design contemporâneo, cozinha equipada, cama de casal, armários planejados e ar-condicionado. Prédio com lavanderia coletiva, coworking e segurança 24h. Localização privilegiada próxima a bancos, comércio, restaurantes e terminal de ônibus urbano.",
+    "location": { "neighborhood": "Centro", "city": "Feira de Santana", "state": "BA" },
+    "specs": { "areaM2": 30, "bedrooms": 1, "suites": 0, "parkingSpots": 0 },
+    "images": [
+      "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1400&q=80"
+    ],
+    "pricing": {
+      "originalPrice": 1600,
+      "discountPercent": 35,
+      "displayPrice": 1040,
+      "condoFee": 320
+    },
+    "createdAt": "2026-10-28T12:00:00.000Z"
+  }
+]

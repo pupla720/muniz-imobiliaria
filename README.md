@@ -1,6 +1,6 @@
 # Muniz Imobiliária — Site institucional + captação via WhatsApp
 
-Site de locação residencial em Aracaju/SE. O trabalho da página é um só:
+Site de locação residencial em Feira de Santana/BA. O trabalho da página é um só:
 fazer a pessoa confiar na imobiliária e sair dali no WhatsApp, com o código
 de um imóvel específico. Métrica de sucesso: cliques no botão de WhatsApp.
 
@@ -18,7 +18,7 @@ se o projeto já está conectado à Vercel, rodar `vercel env pull .env` (passo
 npm install
 cp .env.example .env     # depois edite DATABASE_URL e DATABASE_URL_UNPOOLED
 npx prisma migrate dev   # cria as tabelas no Postgres
-npm run db:seed          # corretores reais + 8 imóveis de exemplo em Aracaju
+npm run db:seed          # corretores + 8 imóveis de exemplo em Feira de Santana
 npm run dev
 ```
 

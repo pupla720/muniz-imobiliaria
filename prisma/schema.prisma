@@ -62,8 +62,8 @@ model Property {
   description  String
   address      String
   bairro       String
-  city         String         @default("Aracaju")
-  state        String         @default("SE")
+  city         String         @default("Feira de Santana")
+  state        String         @default("BA")
   priceMonthly Float
   condominio   Float          @default(0)
   iptu         Float          @default(0)
@@ -154,12 +154,12 @@ model BusinessSettings {
   id                  String   @id @default("default")
   name                String   @default("Muniz Imobiliária")
   creci               String   @default("0000PJ")
-  whatsapp            String   @default("5579999999999")
-  phoneDisplay        String   @default("(79) 99999-9999")
+  whatsapp            String   @default("5575999999999")
+  phoneDisplay        String   @default("(75) 99999-9999")
   addressStreet       String   @default("")
   addressNeighborhood String   @default("")
-  addressCity         String   @default("Aracaju")
-  addressState        String   @default("SE")
+  addressCity         String   @default("Feira de Santana")
+  addressState        String   @default("BA")
   addressZip          String   @default("")
   hours               String   @default("")
   instagramUrl        String?

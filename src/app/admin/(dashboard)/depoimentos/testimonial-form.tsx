@@ -94,7 +94,7 @@ export function TestimonialForm({
         <label className={adminLabel}>Código do imóvel alugado (opcional)</label>
         <input
           name="propertyCode"
-          placeholder="AJU-0142"
+          placeholder="FSA-0142"
           defaultValue={initial.propertyCode}
           className={adminInput}
         />

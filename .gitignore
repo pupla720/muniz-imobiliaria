@@ -49,6 +49,7 @@ next-env.d.ts
 # entregáveis locais (não versionar)
 *.zip
 /preview.html
+/muniz-imobiliaria-vercel
 
 # ferramentas de agente
 /.agents
@@ -57,3 +58,6 @@ next-env.d.ts
 
 # manter o template de ambiente no repositório
 !.env.example
+
+.vercel
+.env*
