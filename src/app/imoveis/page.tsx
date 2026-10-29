@@ -1,145 +1,80 @@
-"use client";
+import type { Metadata } from "next";
+import type { PropertyType } from "@/generated/prisma/enums";
+import { prisma } from "@/lib/prisma";
+import { PropertySearchForm } from "@/components/property-search-form";
+import { PropertyCard } from "@/components/property-card";
+import { getBusinessSettings } from "@/lib/business-settings";
 
-import { useState, useMemo } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { PropertyCard } from "@/components/PropertyCard";
-import propertiesData from "@/data/mock-properties.json";
-import type { Property } from "@/types/property";
+export async function generateMetadata(): Promise<Metadata> {
+  const business = await getBusinessSettings();
+  return {
+    title: `Imóveis selecionados em ${business.addressCity}`,
+    description: `Curadoria de imóveis em ${business.addressCity}, com assessoria jurídica própria e atendimento exclusivo. Disponibilidade sob consulta.`,
+  };
+}
 
-const properties = propertiesData as Property[];
+export default async function CatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ bairro?: string; quartos?: string; tipo?: string }>;
+}) {
+  const params = await searchParams;
+  const bairro = params.bairro?.trim();
+  const quartos = params.quartos ? Number(params.quartos) : undefined;
+  const tipo: PropertyType | undefined =
+    params.tipo === "CASA" || params.tipo === "APARTAMENTO" ? params.tipo : undefined;
 
-export default function ImoveisPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
-  const [minArea, setMinArea] = useState<number>(0);
-  const [maxArea, setMaxArea] = useState<number>(99999);
-
-  const neighborhoods = useMemo(() => {
-    const unique = new Set(properties.map((p) => p.location.neighborhood));
-    return Array.from(unique).sort();
-  }, []);
-
-  const filteredProperties = useMemo(() => {
-    return properties.filter((property) => {
-      const matchesSearch =
-        searchTerm === "" ||
-        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.location.city.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesNeighborhood =
-        selectedNeighborhood === "all" ||
-        property.location.neighborhood === selectedNeighborhood;
-
-      const matchesArea =
-        property.specs.areaM2 >= minArea && property.specs.areaM2 <= maxArea;
-
-      return matchesSearch && matchesNeighborhood && matchesArea;
-    });
-  }, [searchTerm, selectedNeighborhood, minArea, maxArea]);
+  const business = await getBusinessSettings();
+  // Fonte da verdade: o banco. Reflete exatamente o que está cadastrado e
+  // publicado no admin — nunca um arquivo estático de exemplo.
+  const properties = await prisma.property.findMany({
+    where: {
+      ...(bairro ? { bairro } : {}),
+      ...(quartos ? { bedrooms: { gte: quartos } } : {}),
+      ...(tipo ? { type: tipo } : {}),
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-20">
-      <div className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
-            Imóveis para Locação
-          </h1>
-          <p className="mt-3 text-lg text-neutral-600">
-            Oportunidades exclusivas com condição especial de lançamento (simulação -35%).
+    <div className="mx-auto max-w-6xl px-7 py-14 sm:py-20">
+      <p className="font-utility text-xs uppercase tracking-[0.28em] text-latao">
+        Curadoria
+      </p>
+      <div className="w-12 h-px bg-latao mt-5 mb-5" />
+      <h1 className="font-display font-medium text-[clamp(30px,4vw,48px)] tracking-tight text-carvao">
+        Imóveis selecionados em {business.addressCity}
+      </h1>
+      <p className="text-grafite font-light mt-3">
+        {properties.length}{" "}
+        {properties.length === 1 ? "imóvel na seleção" : "imóveis na seleção"}
+      </p>
+
+      <div className="mt-8">
+        <PropertySearchForm
+          defaultBairro={bairro}
+          defaultQuartos={params.quartos}
+          defaultTipo={params.tipo}
+        />
+      </div>
+
+      {properties.length === 0 ? (
+        <div className="mt-12 border border-carvao/15 rounded-md p-10 text-center">
+          <p className="font-display text-xl text-carvao">
+            Nenhum imóvel encontrado com esses critérios.
+          </p>
+          <p className="text-grafite font-light text-sm mt-2">
+            Fale com um de nossos especialistas — temos oportunidades fora da
+            vitrine, apresentadas sob consulta exclusiva.
           </p>
         </div>
-      </div>
-
-      <div className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="relative max-w-md flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="Buscar por nome, cidade..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200 bg-neutral-50 py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <SlidersHorizontal className="hidden h-4 w-4 text-neutral-400 sm:block" />
-              <select
-                value={selectedNeighborhood}
-                onChange={(e) => setSelectedNeighborhood(e.target.value)}
-                className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-              >
-                <option value="all">Todos os Bairros</option>
-                {neighborhoods.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5">
-                <span className="whitespace-nowrap text-xs font-medium text-neutral-500">
-                  Área (m²):
-                </span>
-                <input
-                  type="number"
-                  placeholder="Min"
-                  min={0}
-                  value={minArea || ""}
-                  onChange={(e) => setMinArea(Number(e.target.value) || 0)}
-                  className="w-16 bg-transparent text-sm outline-none placeholder:text-neutral-300"
-                />
-                <span className="text-neutral-300">-</span>
-                <input
-                  type="number"
-                  placeholder="Max"
-                  min={0}
-                  value={maxArea === 99999 ? "" : maxArea}
-                  onChange={(e) => setMaxArea(Number(e.target.value) || 99999)}
-                  className="w-16 bg-transparent text-sm outline-none placeholder:text-neutral-300"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-3 text-xs font-medium text-neutral-500">
-            {filteredProperties.length}{" "}
-            {filteredProperties.length === 1 ? "imóvel encontrado" : "imóveis encontrados"}
-          </div>
+      ) : (
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {properties.map((property) => (
+            <PropertyCard key={property.codigo} property={property} />
+          ))}
         </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {filteredProperties.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 py-20 text-center">
-            <Search className="mb-4 h-12 w-12 text-neutral-300" />
-            <h3 className="text-lg font-medium text-neutral-900">Nenhum imóvel encontrado</h3>
-            <p className="mt-1 text-sm text-neutral-500">
-              Tente ajustar os filtros ou buscar por outros termos.
-            </p>
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setSelectedNeighborhood("all");
-                setMinArea(0);
-                setMaxArea(99999);
-              }}
-              className="mt-4 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
-            >
-              Limpar todos os filtros
-            </button>
-          </div>
-        )}
-      </div>
-    </main>
+      )}
+    </div>
   );
 }
