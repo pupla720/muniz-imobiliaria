@@ -11,8 +11,15 @@ import { ViewTracker } from "@/components/view-tracker";
 import { WhatsAppLink } from "@/components/whatsapp-link";
 import { buildInterestMessage, buildVisitMessage } from "@/lib/whatsapp";
 import { getBusinessSettings } from "@/lib/business-settings";
+import { formatBRL } from "@/lib/format";
 
-const typeLabels = { CASA: "Casa", APARTAMENTO: "Apartamento" };
+const typeLabels: Record<string, string> = {
+  CASA: "Casa",
+  APARTAMENTO: "Apartamento",
+  CHACARA: "Chácara",
+  SITIO: "Sítio",
+  CASA_PRAIA: "Casa de praia",
+};
 
 async function getProperty(codigo: string) {
   return prisma.property.findUnique({ where: { codigo }, include: { broker: true } });
@@ -117,6 +124,31 @@ export default async function PropertyPage({
         <p className="text-carvao font-light leading-relaxed mt-5 max-w-[65ch]">
           {property.description}
         </p>
+
+        {property.modalidade === "TEMPORADA" && (
+          <div className="mt-6 flex flex-wrap gap-8 border-t border-carvao/12 pt-6">
+            {property.priceDaily > 0 && (
+              <div>
+                <p className="font-utility text-[11px] uppercase tracking-[0.18em] text-latao">
+                  Diária
+                </p>
+                <p className="font-display text-2xl text-carvao mt-1">
+                  {formatBRL(property.priceDaily)}
+                </p>
+              </div>
+            )}
+            {property.priceWeekend > 0 && (
+              <div>
+                <p className="font-utility text-[11px] uppercase tracking-[0.18em] text-latao">
+                  Pacote fim de semana
+                </p>
+                <p className="font-display text-2xl text-carvao mt-1">
+                  {formatBRL(property.priceWeekend)}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-10">
           <div className="order-2 lg:order-1 lg:col-span-2">

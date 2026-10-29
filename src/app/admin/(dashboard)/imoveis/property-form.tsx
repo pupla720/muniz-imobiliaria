@@ -13,6 +13,7 @@ import {
 const FIELD_LABELS: Record<string, string> = {
   codigo: "Código",
   type: "Tipo",
+  modalidade: "Modalidade",
   status: "Status",
   title: "Título",
   description: "Descrição",
@@ -20,7 +21,9 @@ const FIELD_LABELS: Record<string, string> = {
   bairro: "Bairro",
   city: "Cidade",
   state: "UF",
-  priceMonthly: "Aluguel",
+  priceMonthly: "Aluguel mensal",
+  priceDaily: "Diária",
+  priceWeekend: "Fim de semana",
   condominio: "Condomínio",
   iptu: "IPTU",
   depositAmount: "Caução",
@@ -33,9 +36,18 @@ const FIELD_LABELS: Record<string, string> = {
   brokerId: "Corretor",
 };
 
+const TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "CASA", label: "Casa" },
+  { value: "APARTAMENTO", label: "Apartamento" },
+  { value: "CHACARA", label: "Chácara" },
+  { value: "SITIO", label: "Sítio" },
+  { value: "CASA_PRAIA", label: "Casa de praia" },
+];
+
 export interface PropertyFormValues {
   codigo: string;
-  type: "CASA" | "APARTAMENTO";
+  type: "CASA" | "APARTAMENTO" | "CHACARA" | "SITIO" | "CASA_PRAIA";
+  modalidade: "MENSAL" | "TEMPORADA";
   status: "DISPONIVEL" | "RESERVADO" | "ALUGADO";
   title: string;
   description: string;
@@ -44,6 +56,8 @@ export interface PropertyFormValues {
   city: string;
   state: string;
   priceMonthly: number;
+  priceDaily: number;
+  priceWeekend: number;
   condominio: number;
   iptu: number;
   depositAmount: number;
@@ -62,6 +76,7 @@ export interface PropertyFormValues {
 const emptyValues: PropertyFormValues = {
   codigo: "",
   type: "CASA",
+  modalidade: "MENSAL",
   status: "DISPONIVEL",
   title: "",
   description: "",
@@ -70,6 +85,8 @@ const emptyValues: PropertyFormValues = {
   city: "Feira de Santana",
   state: "BA",
   priceMonthly: 0,
+  priceDaily: 0,
+  priceWeekend: 0,
   condominio: 0,
   iptu: 0,
   depositAmount: 300,
@@ -107,6 +124,10 @@ export function PropertyForm({
   const initial = defaultValues ?? emptyValues;
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Controla quais campos de preço aparecem (mensal x temporada).
+  const [modalidade, setModalidade] = useState<"MENSAL" | "TEMPORADA">(
+    initial.modalidade ?? "MENSAL",
+  );
   const [photos, setPhotos] = useState<PhotoItem[]>(() => {
     if (!initial.photosText) return [];
     return initial.photosText
@@ -279,12 +300,29 @@ export function PropertyForm({
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label className={adminLabel}>Tipo</label>
-        <select name="type" defaultValue={initial.type} className={adminInput}>
-          <option value="CASA">Casa</option>
-          <option value="APARTAMENTO">Apartamento</option>
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className={adminLabel}>Modalidade</label>
+          <select
+            name="modalidade"
+            value={modalidade}
+            onChange={(e) => setModalidade(e.target.value as "MENSAL" | "TEMPORADA")}
+            className={adminInput}
+          >
+            <option value="MENSAL">Aluguel mensal</option>
+            <option value="TEMPORADA">Aluguel de temporada</option>
+          </select>
+        </div>
+        <div className="space-y-1.5">
+          <label className={adminLabel}>Tipo</label>
+          <select name="type" defaultValue={initial.type} className={adminInput}>
+            {TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <Field label="Título" name="title" defaultValue={initial.title} required />
@@ -307,29 +345,56 @@ export function PropertyForm({
         <Field label="UF" name="state" defaultValue={initial.state} required maxLength={2} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Field
-          label="Aluguel mensal (R$)"
-          name="priceMonthly"
-          type="number"
-          defaultValue={initial.priceMonthly}
-          required
-        />
-        <Field
-          label="Condomínio (R$)"
-          name="condominio"
-          type="number"
-          defaultValue={initial.condominio}
-        />
-        <Field label="IPTU (R$)" name="iptu" type="number" defaultValue={initial.iptu} />
-      </div>
-      <Field
-        label="Caução (R$)"
-        name="depositAmount"
-        type="number"
-        defaultValue={initial.depositAmount}
-        required
-      />
+      {modalidade === "MENSAL" ? (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            <Field
+              label="Aluguel mensal (R$)"
+              name="priceMonthly"
+              type="number"
+              defaultValue={initial.priceMonthly}
+              required
+            />
+            <Field
+              label="Condomínio (R$)"
+              name="condominio"
+              type="number"
+              defaultValue={initial.condominio}
+            />
+            <Field label="IPTU (R$)" name="iptu" type="number" defaultValue={initial.iptu} />
+          </div>
+          <Field
+            label="Caução (R$)"
+            name="depositAmount"
+            type="number"
+            defaultValue={initial.depositAmount}
+          />
+        </>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <Field
+              label="Diária (R$)"
+              name="priceDaily"
+              type="number"
+              defaultValue={initial.priceDaily}
+              required
+            />
+            <Field
+              label="Pacote fim de semana (R$)"
+              name="priceWeekend"
+              type="number"
+              defaultValue={initial.priceWeekend}
+            />
+          </div>
+          <Field
+            label="Caução / sinal (R$, opcional)"
+            name="depositAmount"
+            type="number"
+            defaultValue={initial.depositAmount}
+          />
+        </>
+      )}
 
       <div className="grid grid-cols-4 gap-4">
         <Field

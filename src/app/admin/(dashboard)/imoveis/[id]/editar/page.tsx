@@ -26,6 +26,7 @@ export default async function EditPropertyPage({
   const defaultValues: PropertyFormValues = {
     codigo: property.codigo,
     type: property.type,
+    modalidade: property.modalidade,
     status: property.status,
     title: property.title,
     description: property.description,
@@ -34,6 +35,8 @@ export default async function EditPropertyPage({
     city: property.city,
     state: property.state,
     priceMonthly: property.priceMonthly,
+    priceDaily: property.priceDaily,
+    priceWeekend: property.priceWeekend,
     condominio: property.condominio,
     iptu: property.iptu,
     depositAmount: property.depositAmount,

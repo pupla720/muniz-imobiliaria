@@ -18,6 +18,15 @@ enum Role {
 enum PropertyType {
   CASA
   APARTAMENTO
+  CHACARA
+  SITIO
+  CASA_PRAIA
+}
+
+// Modalidade de locação: mensal (longo prazo) ou temporada (diária).
+enum RentalModalidade {
+  MENSAL
+  TEMPORADA
 }
 
 enum PropertyStatus {
@@ -57,6 +66,7 @@ model Property {
   id           String         @id @default(cuid())
   codigo       String         @unique
   type         PropertyType   @default(CASA)
+  modalidade   RentalModalidade @default(MENSAL)
   status       PropertyStatus @default(DISPONIVEL)
   title        String
   description  String
@@ -64,7 +74,9 @@ model Property {
   bairro       String
   city         String         @default("Feira de Santana")
   state        String         @default("BA")
-  priceMonthly Float
+  priceMonthly Float          @default(0)
+  priceDaily   Float          @default(0) // diária (temporada)
+  priceWeekend Float          @default(0) // pacote de fim de semana (temporada)
   condominio   Float          @default(0)
   iptu         Float          @default(0)
   depositAmount Float         @default(300)

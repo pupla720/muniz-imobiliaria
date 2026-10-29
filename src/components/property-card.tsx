@@ -2,11 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import type { PropertyStatus, PropertyType } from "@/generated/prisma/enums";
 import { PlaceholderPhoto } from "@/components/placeholder-photo";
+import { formatBRL } from "@/lib/format";
 
 export interface PropertyCardData {
   codigo: string;
   status: PropertyStatus;
   type: PropertyType;
+  modalidade?: "MENSAL" | "TEMPORADA";
   title: string;
   bairro: string;
   bedrooms: number;
@@ -14,6 +16,7 @@ export interface PropertyCardData {
   areaM2: number;
   vagas: number;
   priceMonthly: number;
+  priceDaily?: number;
   condominio: number;
   iptu: number;
   depositAmount: number;
@@ -74,9 +77,16 @@ export function PropertyCard({ property }: { property: PropertyCardData }) {
 
         <div className="h-px bg-carvao/12 my-5" />
 
-        <p className="font-utility text-[11px] uppercase tracking-[0.18em] text-grafite">
-          Disponibilidade sob consulta exclusiva
-        </p>
+        {property.modalidade === "TEMPORADA" && property.priceDaily ? (
+          <p className="font-utility text-[13px] uppercase tracking-[0.12em] text-anil">
+            {formatBRL(property.priceDaily)}{" "}
+            <span className="text-grafite text-[11px]">/ diária</span>
+          </p>
+        ) : (
+          <p className="font-utility text-[11px] uppercase tracking-[0.18em] text-grafite">
+            Disponibilidade sob consulta exclusiva
+          </p>
+        )}
         <span className="mt-4 inline-flex items-center font-utility text-[13px] uppercase tracking-[0.12em] text-anil border-b border-latao pb-1 group-hover:text-latao transition-colors">
           Ver detalhes &amp; dossiê
         </span>

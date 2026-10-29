@@ -29,6 +29,7 @@ export default async function CatalogPage({
   // publicado no admin — nunca um arquivo estático de exemplo.
   const properties = await prisma.property.findMany({
     where: {
+      modalidade: "MENSAL",
       ...(bairro ? { bairro } : {}),
       ...(quartos ? { bedrooms: { gte: quartos } } : {}),
       ...(tipo ? { type: tipo } : {}),

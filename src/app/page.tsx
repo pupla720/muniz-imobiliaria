@@ -13,6 +13,7 @@ const statusPriority = { DISPONIVEL: 0, RESERVADO: 1, ALUGADO: 2 };
 
 export default async function HomePage() {
   const properties = await prisma.property.findMany({
+    where: { modalidade: "MENSAL" },
     orderBy: { createdAt: "desc" },
     take: 9,
   });

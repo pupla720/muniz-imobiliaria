@@ -11,6 +11,9 @@ function formatBRL(value: number) {
 const typeLabels: Record<string, string> = {
   CASA: "Casa",
   APARTAMENTO: "Apartamento",
+  CHACARA: "Chácara",
+  SITIO: "Sítio",
+  CASA_PRAIA: "Casa de praia",
 };
 
 export default async function AdminPropertiesPage() {

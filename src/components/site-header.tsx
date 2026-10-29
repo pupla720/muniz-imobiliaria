@@ -21,6 +21,9 @@ export async function SiteHeader() {
           <Link href="/imoveis" className="hover:text-anil transition-colors">
             Imóveis selecionados
           </Link>
+          <Link href="/temporada" className="hover:text-anil transition-colors">
+            Temporada
+          </Link>
           <Link href="/#confianca" className="hover:text-anil transition-colors">
             Assessoria &amp; diferenciais
           </Link>
