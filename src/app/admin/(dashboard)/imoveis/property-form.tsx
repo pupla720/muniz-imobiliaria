@@ -9,6 +9,30 @@ import {
   adminBtnPrimary,
 } from "@/components/admin/ui";
 
+// Rótulos legíveis por campo, para traduzir os erros de validação da API.
+const FIELD_LABELS: Record<string, string> = {
+  codigo: "Código",
+  type: "Tipo",
+  status: "Status",
+  title: "Título",
+  description: "Descrição",
+  address: "Endereço",
+  bairro: "Bairro",
+  city: "Cidade",
+  state: "UF",
+  priceMonthly: "Aluguel",
+  condominio: "Condomínio",
+  iptu: "IPTU",
+  depositAmount: "Caução",
+  bedrooms: "Quartos",
+  bathrooms: "Banheiros",
+  vagas: "Vagas",
+  areaM2: "Área (m²)",
+  andar: "Andar",
+  floorPlanUrl: "URL da planta",
+  brokerId: "Corretor",
+};
+
 export interface PropertyFormValues {
   codigo: string;
   type: "CASA" | "APARTAMENTO";
@@ -212,7 +236,19 @@ export function PropertyForm({
 
     if (!response.ok) {
       const data = await response.json();
-      setError(data.error ?? "Erro ao salvar imóvel.");
+      // A API devolve details.fieldErrors (Zod) — mostra o campo específico
+      // em vez de só "Dados inválidos", pra pessoa saber o que corrigir.
+      const fieldErrors = data?.details?.fieldErrors as
+        | Record<string, string[]>
+        | undefined;
+      if (fieldErrors) {
+        const msgs = Object.entries(fieldErrors)
+          .filter(([, errs]) => errs && errs.length)
+          .map(([field, errs]) => `${FIELD_LABELS[field] ?? field}: ${errs[0]}`);
+        setError(msgs.join(" · ") || data.error || "Dados inválidos.");
+      } else {
+        setError(data.error ?? "Erro ao salvar imóvel.");
+      }
       setLoading(false);
       return;
     }
