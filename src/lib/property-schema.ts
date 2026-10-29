@@ -5,10 +5,7 @@ export const propertySchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(
-      /^[A-Z0-9][A-Z0-9-]{1,23}$/,
-      "Código inválido. Use só letras, números e traço (ex.: FSA-0142).",
-    ),
+        .regex(/^[A-Z0-9][A-Z0-9-]{1,23}$/, "Código inválido. Use só letras, números e traço (ex.: FSA-0142)."),
   type: z.enum(["CASA", "APARTAMENTO"]),
   status: z.enum(["DISPONIVEL", "RESERVADO", "ALUGADO"]),
   title: z.string().min(3, "Informe um título (mín. 3 caracteres)"),
